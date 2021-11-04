@@ -1,0 +1,10 @@
+{
+  "name": "geth",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "bip39": "^3.0.4",
+    "ethereumjs-wallet": "^1.0.2"
+  }
+}
