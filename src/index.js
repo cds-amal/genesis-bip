@@ -1,31 +1,27 @@
-const fs = require("fs");
-const path = require("path");
-const { mnemonicToSeedSync } = require("bip39");
-const { hdkey } = require("ethereumjs-wallet");
-const genesisTemplate = require("./genesis");
+const { docopt } = require("docopt");
+const makeGenesisJson = require("./create-genesis");
 
-const mnemonic = "tilt syrup park comic decorate pill multiply boil mistake velvet property type";
+const doc = `
+Usage:
+  geth-genesis [ options ]
+  geth-genesis -h | --help | --version
 
-const seed = mnemonicToSeedSync(mnemonic)
-const masterWallet = hdkey.fromMasterSeed(seed)
-const derivationPath = "m/44'/60'/0'/0/"
+Options:
+  -h --help                  Show this screen
+  -m --mnemonic=<mnemonic>   Pass mnemonic [default: -]
+  -c --chain-id=<chain-id>   ChainID [default: 1337]
+  -a --accounts=<accounts>   Number of accounts to fund [default: 10]
+  -f --fund=<fund>           Initial funds [default: 100000000000000000000]
+`
 
-const pairGenerator = (index=0) => 
-  () => masterWallet.derivePath(derivationPath + index++).getWallet();
+const args = docopt(doc, { version: '0.0.1-alpha.1' });
 
-const nextPair = pairGenerator(0);
-
-const alloc = {};
-const fund = 1e20;
-for (let i=0; i<10; i++) {
-  alloc[nextPair().pair.getChecksumAddressString()] = { balance: fund.toString() };
+const options = {
+  accounts: parseInt(args["--accounts"], 10),
+  mnemonic: args["--mnemonic"] === "-" ? "" : args["--mnemonic"],
+  chainId: parseInt(args["--chain-id"], 10),
+  fund: args["--fund"]
 }
 
-const genesis = {...genesisTemplate, alloc}
-fs.writeFileSync(
-  path.join(__dirname, "genesis.json"),
-  JSON.stringify(genesis, null, 2)
-);
-
-
-
+console.log(options);
+makeGenesisJson(options);
