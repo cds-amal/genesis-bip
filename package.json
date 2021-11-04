@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "bip39": "^3.0.4",
+    "docopt": "^0.6.2",
     "ethereumjs-wallet": "^1.0.2"
   }
 }
