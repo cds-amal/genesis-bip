@@ -28,5 +28,34 @@ const makeGenesis = ({
   console.log(JSON.stringify(genesis, null, 2));
 }
 
+const makePairs = ({
+  accounts,
+  mnemonic
+}) => {
+  const seed = mnemonicToSeedSync(mnemonic)
+  const masterWallet = hdkey.fromMasterSeed(seed)
+  const derivationPath = "m/44'/60'/0'/0/"
 
-module.exports = makeGenesis;
+  const pairGenerator = (index=0) => 
+    () => masterWallet.derivePath(derivationPath + index++).getWallet();
+
+  const nextPair = pairGenerator(0);
+
+  const publicPrivatePairs = [];
+  for (let i=0; i<accounts; i++) {
+    const currentWallet = nextPair();
+    publicPrivatePairs.push({ 
+      index: i,
+      public: currentWallet.getChecksumAddressString(), 
+      private: currentWallet.getPrivateKeyString() 
+    }) ;
+  }
+
+  console.log(JSON.stringify(publicPrivatePairs, undefined, 2));
+  return publicPrivatePairs;
+}
+
+module.exports = {
+  makeGenesis,
+  makePairs
+}

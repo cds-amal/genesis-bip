@@ -1,10 +1,11 @@
 const { docopt } = require("docopt");
-const makeGenesisJson = require("./create-genesis");
+const { makeGenesisJson, makePairs } = require("./create-genesis");
 
 const doc = `
 Usage:
-  geth-genesis [ options ]
-  geth-genesis -h | --help | --version
+  geth-gen genesis [ options ]
+  geth-gen pairs [ options ]
+  geth-gen -h | --help | --version
 
 Options:
   -h --help                  Show this screen
@@ -20,8 +21,16 @@ const options = {
   accounts: parseInt(args["--accounts"], 10),
   mnemonic: args["--mnemonic"] === "-" ? "" : args["--mnemonic"],
   chainId: parseInt(args["--chain-id"], 10),
-  fund: args["--fund"]
+  fund: args["--fund"],
+  pairs: args.pairs,
+  genesis: args.genesis
+};
+
+if (options.pairs) {
+  makePairs(options);
+} else if (options.genesis) {
+  makeGenesisJson(options);
+} else {
+  console.log('Unknown command!');
 }
 
-console.log(options);
-makeGenesisJson(options);
